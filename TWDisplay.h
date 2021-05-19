@@ -41,4 +41,3 @@ class TWDisplay
      byte TW_read();
 };
 #endif
-
