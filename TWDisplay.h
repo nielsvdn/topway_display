@@ -19,7 +19,7 @@ class TWDisplay
     int readN16(long adressByte);
     void writeN16(int write_value, long address);
     void dispPage(int page_id);
-    void sound();
+    void writeN32(int32_t write_value, long address);
 
   // library-accessible "private" interface
   private:
@@ -29,6 +29,7 @@ class TWDisplay
      byte head;
      byte N16_read_cmd;
      byte N16_write_cmd;
+     byte N32_write_cmd;
      byte disp_page_cmd;
      byte tail[4];
      

@@ -24,6 +24,7 @@ TWDisplay::TWDisplay( HardwareSerial &print, long baud_rate  )
   head = 0xaa;
   N16_read_cmd = 0x3e;
   N16_write_cmd = 0x3d;
+  N32_write_cmd = 0x44;
   disp_page_cmd = 0x70;
   tail[0] = 0xcc;
   tail[1] = 0x33;
@@ -68,8 +69,7 @@ int TWDisplay::readN16(long address){
 
 void TWDisplay::writeN16(int write_value, long address){
   /*
-   * Een functie om gemakkelijk de eerste 255 16-bit variabele te overschrijven op de HKT070DTA-1C.
-   * value: Een getal tussen de -32767 en +32767
+   * Een functie om gemakkelijk 16-bit variabele te overschrijven op de HKT070DTA-1C.
    */
 
   // Convert decimal to byte
@@ -82,6 +82,39 @@ void TWDisplay::writeN16(int write_value, long address){
   writeAddress(address);
   TW_write(byte_h);     // VP_N16 data high byte
   TW_write(byte_l);     // VPN16 data low byte
+  writeTail();
+
+  // Delay
+  delayMicroseconds(20000);
+}
+
+void TWDisplay::writeN32(int32_t write_value, long address){
+  /*
+   * Een functie om gemakkelijk 32-bit variabele te overschrijven op de HKT070DTA-1C.
+   */
+
+  // Convert decimal to byte
+  
+  union {
+    struct {
+	uint8_t byte1;
+	uint8_t byte2;
+	uint8_t byte3;
+	uint8_t byte4;
+    };
+    int32_t longint;
+  } split_write_value;
+
+  split_write_value.longint = write_value;
+
+  // Send Data
+  TW_write(head);       // packet head
+  TW_write(N32_write_cmd);  // VP_N16 write command
+  writeAddress(address);
+  TW_write(split_write_value.byte4);
+  TW_write(split_write_value.byte3);
+  TW_write(split_write_value.byte2);
+  TW_write(split_write_value.byte1);
   writeTail();
 
   // Delay
@@ -108,20 +141,6 @@ void TWDisplay::dispPage(int page_id){
   delayMicroseconds(20000);
 }
 
-void TWDisplay::sound(){
-  /*
-   * Een functie om gemakkelijk van pagina te wisselen op de HKT070DTA-1C.
-   */
-
-  // Send Data
-  TW_write(head);       // packet head
-  TW_write(0x79);  // VP_N16 write command
-  TW_write(0x3F);
-  writeTail();
-
-  // Delay
-  delayMicroseconds(20000);
-}
 
 // Private Methods /////////////////////////////////////////////////////////////
 // Functions only available to other functions in this library
