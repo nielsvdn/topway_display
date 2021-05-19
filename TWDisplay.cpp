@@ -145,11 +145,11 @@ void TWDisplay::dispPage(int page_id){
 // Private Methods /////////////////////////////////////////////////////////////
 // Functions only available to other functions in this library
 void TWDisplay::writeTail(){
-  for (int i = 0; i < sizeof(tail) ; i++) TW_write(tail[i]);
+  for (int i = 0; (unsigned)i < sizeof(tail) ; i++) TW_write(tail[i]);
 }
 
 void TWDisplay::readTail(){
-  for (int i = 0; i < sizeof(tail) ; i++) TW_serial->read();
+  for (int i = 0; (unsigned)i < sizeof(tail) ; i++) TW_serial->read();
 }
 
 void TWDisplay::TW_write(byte value){
@@ -164,7 +164,8 @@ void TWDisplay::writeAddress( int32_t  address ) {
   unsigned char *p = (unsigned char*) & address;
   byte a[sizeof(int32_t)];
   for (unsigned i = 0; i < sizeof(int32_t); i++) {
-    a[i] = ("0x%02x", p[i]);
+    a[i] = (p[i]);
+    //a[i] = ("0x%02x", p[i]);
   }
 
   TW_write(a[3]);        // Send adress
